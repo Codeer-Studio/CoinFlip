@@ -1,0 +1,4 @@
+name: CoinFlip
+version: '1.0-SNAPSHOT'
+main: io.github.CodeerStudio.coinFlip.CoinFlip
+api-version: '1.21'
