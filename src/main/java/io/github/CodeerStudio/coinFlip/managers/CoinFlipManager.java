@@ -1,5 +1,6 @@
 package io.github.CodeerStudio.coinFlip.managers;
 
+import io.github.CodeerStudio.coinFlip.api.VaultAPI;
 import io.github.CodeerStudio.coinFlip.data.CoinFlipData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,6 +13,7 @@ public class CoinFlipManager {
 
     private final Map<String, CoinFlipData> activeCoinFlips = new HashMap<>();
     private final Random random = new Random();
+    private final MoneyManager moneyManager = new MoneyManager();
 
     public void addCoinFlip(String key, CoinFlipData coinFlipData) {
         this.activeCoinFlips.put(key, coinFlipData);
@@ -57,24 +59,37 @@ public class CoinFlipManager {
             return "No active coinflip found for this player or you were not invited.";
         }
 
-        // Determine the result
-        String result = random.nextBoolean() ? "heads" : "tails";
 
         // Players involved
         Player inviter = coinFlipData.getInviter();
         double amount = coinFlipData.getAmount();
 
+        if (moneyManager.hasEnoughMoney(inviter, amount)) {
+            return inviter.getName() + " does not have enough money";
+        }
+
+        if (moneyManager.hasEnoughMoney(targetPlayer, amount)) {
+            return targetPlayer.getName() + " does not have enough money";
+        }
+
+        moneyManager.withdrawMoney(inviter, amount);
+        moneyManager.withdrawMoney(targetPlayer, amount);
+
+
+        // Determine the result
+        String result = random.nextBoolean() ? "heads" : "tails";
+
         // Winner and loser
         Player winner = result.equals("heads") ? inviter : targetPlayer;
         Player loser = winner.equals(inviter) ? targetPlayer : inviter;
+
+        moneyManager.depositMoney(winner, amount * 2);
 
         // Broadcast results
         Bukkit.broadcastMessage(inviter.getName() + " and " + targetPlayer.getName() + " are flipping a coin for " + amount + " coins!");
         Bukkit.broadcastMessage("The coin landed on " + result + "!");
         winner.sendMessage("You won the coinflip and earned " + amount + " coins!");
         loser.sendMessage("You lost the coinflip and lost " + amount + " coins.");
-
-        // TODO: Handle transactions with the economy plugin.
 
         // Remove the coinflip
         removeCoinFlip(inviterName);
