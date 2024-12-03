@@ -6,7 +6,7 @@ author: Thomas Froud
 commands:
   coinflip:
     description: Start or join a coinflip
-    usage: /coinflip <amount> <person>
+    usage: /coinflip <amount> <player>
   coinflipaccept:
     description: Accepts the invite to the coinflip
-    usage: /coinflip accept
+    usage: /coinflipaccept <player>

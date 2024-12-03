@@ -1,6 +1,7 @@
 package io.github.CodeerStudio.coinFlip.commands;
 
 import io.github.CodeerStudio.coinFlip.data.CoinFlipData;
+import io.github.CodeerStudio.coinFlip.managers.CoinFlipManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,8 +15,11 @@ import java.util.Random;
 
 public class CoinFlipCMD implements CommandExecutor {
 
-    private final Map<String, CoinFlipData> activeCoinFlips = new HashMap<>();
-    private final Random random = new Random();
+    private CoinFlipManager coinFlipManager;
+
+    public CoinFlipCMD(CoinFlipManager coinFlipManager) {
+        this.coinFlipManager = coinFlipManager;
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
@@ -28,7 +32,7 @@ public class CoinFlipCMD implements CommandExecutor {
         Player player = (Player) commandSender;
 
         if (strings.length < 2) {
-            player.sendMessage("Usage: /coinflip <amount> <person>");
+            player.sendMessage("Usage: /coinflip <amount> <player>");
             return true;
         }
 
@@ -48,25 +52,23 @@ public class CoinFlipCMD implements CommandExecutor {
         }
 
         // Ensure the inviter does not already have an active coinflip
-        if (activeCoinFlips.containsKey(player.getName())) {
+        if (coinFlipManager.getCoinFlipKey(player.getName())) {
             player.sendMessage("You already have an active coinflip!");
             return true;
         }
 
         // Ensure the target player is not already in an active coinflip
-        if (activeCoinFlips.containsKey(targetPlayer.getName())) {
+        if (coinFlipManager.getCoinFlipKey(targetPlayer.getName())) {
             player.sendMessage("The player you invited is already in a coinflip.");
             return true;
         }
 
-
         CoinFlipData coinFlipData = new CoinFlipData(player, amount, player);
-        activeCoinFlips.put(player.getName(), coinFlipData);
+        coinFlipManager.addCoinFlip(player.getName(), coinFlipData);
 
         player.sendMessage("You have invited " + targetPlayer.getName() + " to a coinflip for " + amount + " coins!");
         targetPlayer.sendMessage(player.getName() + " has invited you to a coinflip for " + amount + " coins! Type /coinflip accept " + player.getName() + " to accept.");
 
         return true;
     }
-
 }
