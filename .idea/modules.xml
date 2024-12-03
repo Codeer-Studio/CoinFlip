@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CoinFlip.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CoinFlip.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/io.github.CodeerStudio.CoinFlip.main.iml" filepath="$PROJECT_DIR$/.idea/modules/io.github.CodeerStudio.CoinFlip.main.iml" />
     </modules>
   </component>
 </project>

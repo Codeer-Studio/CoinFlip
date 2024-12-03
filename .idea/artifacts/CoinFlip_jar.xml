@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CoinFlip:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CoinFlip_1.21.1_Jar</output-path>
+    <root id="archive" name="CoinFlip.jar">
+      <element id="module-output" name="io.github.CodeerStudio.CoinFlip.main" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/plugin.yml" />
+    </root>
+  </artifact>
+</component>
