@@ -2,3 +2,11 @@ name: CoinFlip
 version: '1.0-SNAPSHOT'
 main: io.github.CodeerStudio.coinFlip.CoinFlip
 api-version: '1.21'
+author: Thomas Froud
+commands:
+  coinflip:
+    description: Start or join a coinflip
+    usage: /coinflip <amount> <person>
+  coinflipaccept:
+    description: Accepts the invite to the coinflip
+    usage: /coinflip accept
