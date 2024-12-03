@@ -1,9 +1,11 @@
 package io.github.CodeerStudio.coinFlip.managers;
 
+import io.github.CodeerStudio.coinFlip.CoinFlip;
 import io.github.CodeerStudio.coinFlip.api.VaultAPI;
 import io.github.CodeerStudio.coinFlip.data.CoinFlipData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +14,46 @@ import java.util.Random;
 public class CoinFlipManager {
 
     private final Map<String, CoinFlipData> activeCoinFlips = new HashMap<>();
+    private final Map<String, BukkitTask> timeoutTasks = new HashMap<>();
     private final Random random = new Random();
     private final MoneyManager moneyManager = new MoneyManager();
+    private final CoinFlip plugin;
+
+    public CoinFlipManager(CoinFlip plugin) {
+        this.plugin = plugin;
+    }
 
     public void addCoinFlip(String key, CoinFlipData coinFlipData) {
         this.activeCoinFlips.put(key, coinFlipData);
+
+        // Schedule a timeout task
+        BukkitTask task = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (activeCoinFlips.containsKey(key)) {
+                cancelCoinFlip(key);
+                Player inviter = coinFlipData.getInviter();
+                inviter.sendMessage("Your coinflip has been canceled due to no response.");
+                Player target = coinFlipData.getTargetPlayer();
+                if (target.isOnline()) {
+                    target.sendMessage("The coinflip invitation from " + inviter.getName() + " has expired.");
+                }
+            }
+        }, 15 * 20L); // 15 seconds, 20 ticks per second
+
+        timeoutTasks.put(key, task);
     }
 
     public void removeCoinFlip(String key) {
-        this.activeCoinFlips.remove(key);
+        activeCoinFlips.remove(key);
+
+        // Cancel and remove the timeout task if it exists
+        BukkitTask task = timeoutTasks.remove(key);
+        if (task != null) {
+            task.cancel();
+        }
+    }
+
+    public void cancelCoinFlip(String key) {
+        removeCoinFlip(key);
     }
 
     public boolean hasActiveCoinFlip(String key) {
@@ -64,11 +97,11 @@ public class CoinFlipManager {
         Player inviter = coinFlipData.getInviter();
         double amount = coinFlipData.getAmount();
 
-        if (moneyManager.hasEnoughMoney(inviter, amount)) {
+        if (!moneyManager.hasEnoughMoney(inviter, amount)) {
             return inviter.getName() + " does not have enough money";
         }
 
-        if (moneyManager.hasEnoughMoney(targetPlayer, amount)) {
+        if (!moneyManager.hasEnoughMoney(targetPlayer, amount)) {
             return targetPlayer.getName() + " does not have enough money";
         }
 
@@ -86,10 +119,10 @@ public class CoinFlipManager {
         moneyManager.depositMoney(winner, amount * 2);
 
         // Broadcast results
-        Bukkit.broadcastMessage(inviter.getName() + " and " + targetPlayer.getName() + " are flipping a coin for " + amount + " coins!");
+        Bukkit.broadcastMessage(inviter.getName() + " and " + targetPlayer.getName() + " are flipping a coin for " + amount);
         Bukkit.broadcastMessage("The coin landed on " + result + "!");
-        winner.sendMessage("You won the coinflip and earned " + amount + " coins!");
-        loser.sendMessage("You lost the coinflip and lost " + amount + " coins.");
+        winner.sendMessage("You won the coinflip and earned " + amount);
+        loser.sendMessage("You lost the coinflip and lost " + amount);
 
         // Remove the coinflip
         removeCoinFlip(inviterName);

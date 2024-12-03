@@ -61,8 +61,8 @@ public class CoinFlipCMD implements CommandExecutor {
         }
 
         // Notify both players
-        inviter.sendMessage("You have invited " + targetPlayer.getName() + " to a coinflip for " + amount + " coins!");
-        targetPlayer.sendMessage(inviter.getName() + " has invited you to a coinflip for " + amount + " coins! Type /coinflipaccept " + inviter.getName() + " to accept.");
+        inviter.sendMessage("You have invited " + targetPlayer.getName() + " to a coinflip for " + amount);
+        targetPlayer.sendMessage(inviter.getName() + " has invited you to a coinflip for " + amount + " Type /coinflipaccept " + inviter.getName() + " to accept.");
 
         return true;
     }

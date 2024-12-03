@@ -33,18 +33,22 @@ public class CoinFlipAcceptCMD implements CommandExecutor {
         }
 
         String inviterName = args[0];
+        CoinFlipData coinFlipData = coinFlipManager.getActiveCoinFlip(inviterName);
 
-        // Validate inviter
-        Player inviter = Bukkit.getPlayer(inviterName);
-        if (inviter == null || !inviter.isOnline()) {
-            player.sendMessage("The specified player is not online or does not exist.");
+        if (coinFlipData == null) {
+            player.sendMessage("No active coinflip found from " + inviterName + ".");
             return true;
         }
 
-        // Resolve the coinflip
-        String errorMessage = coinFlipManager.resolveCoinFlip(inviterName, player);
-        if (errorMessage != null) {
-            player.sendMessage(errorMessage);
+        if (!coinFlipData.getTargetPlayer().equals(player)) {
+            player.sendMessage("You were not invited to this coinflip.");
+            return true;
+        }
+
+        // Resolve coinflip
+        String result = coinFlipManager.resolveCoinFlip(inviterName, player);
+        if (result != null) {
+            player.sendMessage(result);
         }
 
         return true;
