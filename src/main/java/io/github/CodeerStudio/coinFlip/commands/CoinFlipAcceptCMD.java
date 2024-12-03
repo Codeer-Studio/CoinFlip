@@ -18,59 +18,34 @@ public class CoinFlipAcceptCMD implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if(!(commandSender instanceof Player)) {
+        if (!(commandSender instanceof Player)) {
             commandSender.sendMessage("This command can only be run by a player.");
             return true;
         }
 
         Player player = (Player) commandSender;
 
-        if (strings.length < 1) {
+        if (args.length < 1) {
             player.sendMessage("Usage: /coinflipaccept <player>");
             return true;
         }
 
-        String inviterName = strings[0];
-        Player inviter = Bukkit.getPlayer(inviterName);
+        String inviterName = args[0];
 
+        // Validate inviter
+        Player inviter = Bukkit.getPlayer(inviterName);
         if (inviter == null || !inviter.isOnline()) {
             player.sendMessage("The specified player is not online or does not exist.");
             return true;
         }
 
-        // Check if the inviter has an active coinflip
-        if (!coinFlipManager.getCoinFlipKey(inviterName)) {
-            player.sendMessage("No active coinflip found from " + inviterName + ".");
-            return true;
+        // Resolve the coinflip
+        String errorMessage = coinFlipManager.resolveCoinFlip(inviterName, player);
+        if (errorMessage != null) {
+            player.sendMessage(errorMessage);
         }
-
-        CoinFlipData coinFlipData = coinFlipManager.getActiveCoinFlip(inviterName);
-
-        if (!coinFlipData.getTargetPlayer().equals(player)) {
-            player.sendMessage("You were not invited to this coinflip.");
-            return true;
-        }
-
-        // Randomize the outcome
-        String result = new java.util.Random().nextBoolean() ? "heads" : "tails";
-
-        Bukkit.broadcastMessage(inviterName + " and " + player.getName() + " are flipping a coin for " + coinFlipData.getAmount() + " coins!");
-        Bukkit.broadcastMessage("The coin landed on " + result + "!");
-
-        // Determine winner and loser
-        Player winner = result.equals("heads") ? inviter : player;
-        Player loser = winner.equals(inviter) ? player : inviter;
-
-        // Notify players of the outcome
-        winner.sendMessage("You won the coinflip and earned " + coinFlipData.getAmount() + " coins!");
-        loser.sendMessage("You lost the coinflip and lost " + coinFlipData.getAmount() + " coins.");
-
-        // TODO: Integrate with your economy plugin to handle transactions here.
-
-        // Clean up the coinflip
-        coinFlipManager.removeCoinFlip(inviterName, coinFlipData);
 
         return true;
     }

@@ -15,59 +15,54 @@ import java.util.Random;
 
 public class CoinFlipCMD implements CommandExecutor {
 
-    private CoinFlipManager coinFlipManager;
+    private final CoinFlipManager coinFlipManager;
 
     public CoinFlipCMD(CoinFlipManager coinFlipManager) {
         this.coinFlipManager = coinFlipManager;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if(!(commandSender instanceof Player)) {
-            commandSender.sendMessage("This command can only be run by a player.");
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("This command can only be run by a player.");
             return true;
         }
 
-        Player player = (Player) commandSender;
+        Player inviter = (Player) sender;
 
-        if (strings.length < 2) {
-            player.sendMessage("Usage: /coinflip <amount> <player>");
+        // Validate arguments
+        if (args.length < 2) {
+            inviter.sendMessage("Usage: /coinflip <amount> <player>");
             return true;
         }
 
+        // Parse the amount
         double amount;
         try {
-            amount = Double.parseDouble(strings[0]);
+            amount = Double.parseDouble(args[0]);
         } catch (NumberFormatException e) {
-            player.sendMessage("Please enter a valid amount.");
+            inviter.sendMessage("Please enter a valid amount.");
             return true;
         }
 
-        // Find the target player
-        Player targetPlayer = Bukkit.getPlayer(strings[1]);
+        // Get the target player
+        Player targetPlayer = Bukkit.getPlayer(args[1]);
         if (targetPlayer == null || !targetPlayer.isOnline()) {
-            player.sendMessage("The specified player is not online.");
+            inviter.sendMessage("The specified player is not online.");
             return true;
         }
 
-        // Ensure the inviter does not already have an active coinflip
-        if (coinFlipManager.getCoinFlipKey(player.getName())) {
-            player.sendMessage("You already have an active coinflip!");
+        // Delegate coinflip creation to the manager
+        String errorMessage = coinFlipManager.createCoinFlip(inviter, targetPlayer, amount);
+        if (errorMessage != null) {
+            inviter.sendMessage(errorMessage);
             return true;
         }
 
-        // Ensure the target player is not already in an active coinflip
-        if (coinFlipManager.getCoinFlipKey(targetPlayer.getName())) {
-            player.sendMessage("The player you invited is already in a coinflip.");
-            return true;
-        }
-
-        CoinFlipData coinFlipData = new CoinFlipData(player, amount, player);
-        coinFlipManager.addCoinFlip(player.getName(), coinFlipData);
-
-        player.sendMessage("You have invited " + targetPlayer.getName() + " to a coinflip for " + amount + " coins!");
-        targetPlayer.sendMessage(player.getName() + " has invited you to a coinflip for " + amount + " coins! Type /coinflip accept " + player.getName() + " to accept.");
+        // Notify both players
+        inviter.sendMessage("You have invited " + targetPlayer.getName() + " to a coinflip for " + amount + " coins!");
+        targetPlayer.sendMessage(inviter.getName() + " has invited you to a coinflip for " + amount + " coins! Type /coinflipaccept " + inviter.getName() + " to accept.");
 
         return true;
     }
