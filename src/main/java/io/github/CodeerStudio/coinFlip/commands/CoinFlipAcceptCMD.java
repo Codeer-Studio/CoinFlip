@@ -28,7 +28,7 @@ public class CoinFlipAcceptCMD implements CommandExecutor {
         Player player = (Player) commandSender;
 
         if (args.length < 1) {
-            player.sendMessage("Usage: /coinflipaccept <player>");
+            player.sendMessage("Usage: /cfaccept <player>");
             return true;
         }
 

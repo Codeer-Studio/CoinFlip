@@ -9,4 +9,4 @@ commands:
     usage: /coinflip <amount> <player>
   coinflipaccept:
     description: Accepts the invite to the coinflip
-    usage: /coinflipaccept <player>
+    usage: /cfaccept <player>

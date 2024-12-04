@@ -4,6 +4,7 @@ import io.github.CodeerStudio.coinFlip.CoinFlip;
 import io.github.CodeerStudio.coinFlip.api.VaultAPI;
 import io.github.CodeerStudio.coinFlip.data.CoinFlipData;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -120,9 +121,8 @@ public class CoinFlipManager {
 
         // Broadcast results
         Bukkit.broadcastMessage(inviter.getName() + " and " + targetPlayer.getName() + " are flipping a coin for " + amount);
-        Bukkit.broadcastMessage("The coin landed on " + result + "!");
-        winner.sendMessage("You won the coinflip and earned " + amount);
-        loser.sendMessage("You lost the coinflip and lost " + amount);
+        winner.sendMessage(ChatColor.GREEN + "You won the coinflip and earned " + ChatColor.GOLD + amount);
+        loser.sendMessage(ChatColor.RED + "You lost the coinflip and lost " + ChatColor.GOLD + amount);
 
         // Remove the coinflip
         removeCoinFlip(inviterName);

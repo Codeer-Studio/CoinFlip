@@ -23,7 +23,7 @@ public final class CoinFlip extends JavaPlugin {
         CoinFlipManager coinFlipManager = new CoinFlipManager(this);
 
         getCommand("coinflip").setExecutor(new CoinFlipCMD(coinFlipManager));
-        getCommand("coinflipaccept").setExecutor(new CoinFlipAcceptCMD(coinFlipManager));
+        getCommand("cfaccept").setExecutor(new CoinFlipAcceptCMD(coinFlipManager));
 
     }
 
