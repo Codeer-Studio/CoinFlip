@@ -1,6 +1,7 @@
 # Coinflip
 
 **Coinflip** is a Minecraft plugin that allows players to engage in coinflip wagers for in-game currency. Perfect for adding an exciting gambling mechanic to your server, powered by the Vault economy API.
+https://www.spigotmc.org/resources/coinfilp.121138/
 
 ---
 
